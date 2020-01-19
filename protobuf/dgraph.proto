@@ -1,18 +1,20 @@
 syntax="proto3";
-package proto;
-import "defs.proto";
+package dgraph;
+option go_package = "github.com/benka-me/cell-dgraph/go-pkg/dgraph";
+
+import "github.com/benka-me/hive/protobuf/hive.proto";
 
 service dgraphUser {
-    rpc InitDb(Empty) returns (Empty);
+    rpc InitDb(hive.Empty) returns (hive.Empty);
 
-    rpc RegisterUser(NewUser) returns (User);
-    rpc Login(LoginRequest) returns (User);
-    rpc UidGet(Str) returns (User);
-    rpc UidDelete(Str) returns (N);
-    rpc UsernameGet(Str) returns (User);
-    rpc UsernameDelete(Str) returns (N);
-    rpc UserSet(User) returns (Str);
-    rpc UserDelete(User) returns (N);
+    rpc RegisterUser(hive.NewUser) returns (hive.User);
+    rpc Login(hive.LoginRequest) returns (hive.User);
+    rpc UidGet(hive.Str) returns (hive.User);
+    rpc UidDelete(hive.Str) returns (hive.N);
+    rpc UsernameGet(hive.Str) returns (hive.User);
+    rpc UsernameDelete(hive.Str) returns (hive.N);
+    rpc UserSet(hive.User) returns (hive.Str);
+    rpc UserDelete(hive.User) returns (hive.N);
 
-    rpc RegisterCustomer(HandshakeReq) returns (Welcome);
+    rpc RegisterCustomer(hive.HandshakeReq) returns (hive.Welcome);
 }

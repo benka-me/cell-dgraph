@@ -23,7 +23,7 @@ var (
 	dgraph     conn.Dgraph
 )
 
-func DbServer() {
+func StartCellDgraph() {
 	var err error
 	dgraph.Dgraph, err = conn.NewClient()
 	if err != nil {
