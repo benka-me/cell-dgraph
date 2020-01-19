@@ -1,0 +1,93 @@
+package room
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/benka-me/PaasEnger/service-hive/go/go-proto"
+	conn2 "github.com/benka-me/PaasEnger/services/db/pkg/conn"
+	"github.com/dgraph-io/dgo/protos/api"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
+
+func Insert(handshake *proto.HandshakeReq, dgraph conn2.Dgraph) (*proto.Room, error) {
+	var ret proto.Room
+	mut := struct {
+		Room string `json:"Room"`
+	}{
+		Room: handshake.Name + " request",
+	}
+
+	txn := dgraph.NewTxn()
+	defer txn.Discard(context.TODO())
+	mu := &api.Mutation{
+		CommitNow: true,
+	}
+
+	pb, err := json.Marshal(mut)
+	if err != nil {
+		return &ret, status.Error(codes.Internal, "new room: error marshall")
+	}
+
+	mu.SetJson = pb
+	response, err := txn.Mutate(context.Background(), mu)
+	if err != nil {
+		return &ret, status.Error(codes.Internal, err.Error())
+	}
+	for _, uid := range response.GetUids() {
+		ret.Id = uid
+	}
+
+	return &ret, nil
+}
+
+func edge(targetUid string, roomUid string, dgraph conn2.Dgraph) error {
+	fmt.Println("Link to room: ", targetUid, roomUid)
+	mut := struct {
+		Uid  string `json:"uid"`
+		Join struct {
+			Uid string `json:"uid"`
+		} `json:"join"`
+	}{
+		Uid: targetUid,
+	}
+	mut.Join.Uid = roomUid
+
+	txn := dgraph.NewTxn()
+	defer txn.Discard(context.TODO())
+	mu := &api.Mutation{
+		CommitNow: true,
+	}
+
+	pb, err := json.Marshal(mut)
+	if err != nil {
+		return status.Error(codes.Internal, "link to room: error marshall")
+	}
+
+	mu.SetJson = pb
+	_, err = txn.Mutate(context.Background(), mu)
+	if err != nil {
+		return status.Error(codes.Internal, err.Error())
+	}
+	return status.Error(codes.OK, "")
+}
+
+func InitEdges(handshake *proto.HandshakeReq, customerUid string, dgraph conn2.Dgraph) (*proto.Room, error) {
+	var ret *proto.Room
+	ret, err := Insert(handshake, dgraph)
+	if err != nil {
+		return ret, nil
+	}
+
+	err = edge(handshake.ToUserId, ret.GetId(), dgraph)
+	if err != nil {
+		return ret, nil
+	}
+
+	err = edge(customerUid, ret.GetId(), dgraph)
+	if err != nil {
+		return ret, nil
+	}
+	return ret, nil
+}

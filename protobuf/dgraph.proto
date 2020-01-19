@@ -1,0 +1,18 @@
+syntax="proto3";
+package proto;
+import "defs.proto";
+
+service dgraphUser {
+    rpc InitDb(Empty) returns (Empty);
+
+    rpc RegisterUser(NewUser) returns (User);
+    rpc Login(LoginRequest) returns (User);
+    rpc UidGet(Str) returns (User);
+    rpc UidDelete(Str) returns (N);
+    rpc UsernameGet(Str) returns (User);
+    rpc UsernameDelete(Str) returns (N);
+    rpc UserSet(User) returns (Str);
+    rpc UserDelete(User) returns (N);
+
+    rpc RegisterCustomer(HandshakeReq) returns (Welcome);
+}
