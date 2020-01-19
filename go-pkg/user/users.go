@@ -1,7 +1,7 @@
 package user
 
 import (
-	conn2 "github.com/benka-me/PaasEnger/services/db/pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/conn"
 )
 
 /**
@@ -9,11 +9,11 @@ import (
 BY Users
 ****************************************************************************************************
 */
-func (users Users) Get(d conn2.Dgraph) (Users, error) {
+func (users Users) Get(d conn.Dgraph) (Users, error) {
 	panic("implement me")
 }
 
-func (users Users) Set(d conn2.Dgraph) (Uids, error) {
+func (users Users) Set(d conn.Dgraph) (Uids, error) {
 	ret := make(Uids, 0)
 	for _, u := range users {
 		s, err := u.Set(d)
@@ -26,7 +26,7 @@ func (users Users) Set(d conn2.Dgraph) (Uids, error) {
 	return ret, nil
 }
 
-func (users Users) Delete(d conn2.Dgraph) (int, error) {
+func (users Users) Delete(d conn.Dgraph) (int, error) {
 	n := 0
 	for i, u := range users {
 		_, err := u.Delete(d)
@@ -38,10 +38,10 @@ func (users Users) Delete(d conn2.Dgraph) (int, error) {
 	return n, nil
 }
 
-func (users Users) SetAndGet(d conn2.Dgraph) (Users, error) {
+func (users Users) SetAndGet(d conn.Dgraph) (Users, error) {
 	panic("implement me")
 }
 
-func (users Users) DelAndGet(d conn2.Dgraph) (Users, error) {
+func (users Users) DelAndGet(d conn.Dgraph) (Users, error) {
 	panic("implement me")
 }

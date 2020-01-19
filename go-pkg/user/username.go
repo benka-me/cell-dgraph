@@ -2,7 +2,7 @@ package user
 
 import (
 	"fmt"
-	conn2 "github.com/benka-me/PaasEnger/services/db/pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/conn"
 )
 
 /**
@@ -10,7 +10,7 @@ import (
 BY Username
 ****************************************************************************************************
 */
-func (u Username) Get(dgraph conn2.Dgraph) (Users, error) {
+func (u Username) Get(dgraph conn.Dgraph) (Users, error) {
 	q := fmt.Sprintf(`
 		{
 			users(func: eq(Username, "%s")) {
@@ -31,11 +31,11 @@ func (u Username) Get(dgraph conn2.Dgraph) (Users, error) {
 	return ret, err
 }
 
-func (u Username) Set(dgraph conn2.Dgraph) (Uid, error) {
+func (u Username) Set(dgraph conn.Dgraph) (Uid, error) {
 	return User{Username: string(u)}.Set(dgraph)
 }
 
-func (u Username) Delete(dgraph conn2.Dgraph) (int32, error) {
+func (u Username) Delete(dgraph conn.Dgraph) (int32, error) {
 	uids, err := u.Get(dgraph)
 	if err != nil {
 		return 0, err
@@ -44,11 +44,11 @@ func (u Username) Delete(dgraph conn2.Dgraph) (int32, error) {
 	return int32(n), err
 }
 
-func (u Username) SetAndGet(dgraph conn2.Dgraph) (Users, error) {
+func (u Username) SetAndGet(dgraph conn.Dgraph) (Users, error) {
 	panic("implement me")
 }
 
-func (u Username) DelAndGet(dgraph conn2.Dgraph) (Users, error) {
+func (u Username) DelAndGet(dgraph conn.Dgraph) (Users, error) {
 	_, err := u.Delete(dgraph)
 	if err != nil {
 		return nil, err

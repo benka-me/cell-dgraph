@@ -1,0 +1,39 @@
+settings:
+  files:
+    outputs:
+      status: false
+      path: ""
+      name: .r.outputs.log
+    logs:
+      status: false
+      path: ""
+      name: .r.logs.log
+    errors:
+      status: false
+      path: ""
+      name: .r.errors.log
+  legacy:
+    force: false
+    interval: 0s
+schema:
+- name: cell-dgraph
+  path: .
+  commands:
+    vet:
+      args:
+      - "n"
+    test:
+      status: true
+    install:
+      status: true
+    run:
+      status: true
+  watcher:
+    extensions:
+    - go
+    paths:
+    - ../go-pkg
+    ignored_paths:
+    - .git
+    - .realize
+    - vendor

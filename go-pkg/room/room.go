@@ -4,15 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/benka-me/PaasEnger/service-hive/go/go-proto"
-	conn2 "github.com/benka-me/PaasEnger/services/db/pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/conn"
+	"github.com/benka-me/hive/go-pkg/hive"
 	"github.com/dgraph-io/dgo/protos/api"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func Insert(handshake *proto.HandshakeReq, dgraph conn2.Dgraph) (*proto.Room, error) {
-	var ret proto.Room
+func Insert(handshake *hive.HandshakeReq, dgraph conn.Dgraph) (*hive.Room, error) {
+	var ret hive.Room
 	mut := struct {
 		Room string `json:"Room"`
 	}{
@@ -42,7 +42,7 @@ func Insert(handshake *proto.HandshakeReq, dgraph conn2.Dgraph) (*proto.Room, er
 	return &ret, nil
 }
 
-func edge(targetUid string, roomUid string, dgraph conn2.Dgraph) error {
+func edge(targetUid string, roomUid string, dgraph conn.Dgraph) error {
 	fmt.Println("Link to room: ", targetUid, roomUid)
 	mut := struct {
 		Uid  string `json:"uid"`
@@ -73,8 +73,8 @@ func edge(targetUid string, roomUid string, dgraph conn2.Dgraph) error {
 	return status.Error(codes.OK, "")
 }
 
-func InitEdges(handshake *proto.HandshakeReq, customerUid string, dgraph conn2.Dgraph) (*proto.Room, error) {
-	var ret *proto.Room
+func InitEdges(handshake *hive.HandshakeReq, customerUid string, dgraph conn.Dgraph) (*hive.Room, error) {
+	var ret *hive.Room
 	ret, err := Insert(handshake, dgraph)
 	if err != nil {
 		return ret, nil

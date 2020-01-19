@@ -1,8 +1,8 @@
 package rpc
 
 import (
-	"github.com/benka-me/PaasEnger/service-hive/go/go-proto"
-	"github.com/benka-me/PaasEnger/services/db/pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/dgraph"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 	"log"
@@ -20,12 +20,12 @@ const (
 var (
 	grpcServer *grpc.Server
 	guide      *Server
-	dgraph     conn.Dgraph
+	db         conn.Dgraph
 )
 
 func StartCellDgraph() {
 	var err error
-	dgraph.Dgraph, err = conn.NewClient()
+	db.Dgraph, err = conn.NewClient()
 	if err != nil {
 		panic(err)
 	}
@@ -37,7 +37,7 @@ func StartCellDgraph() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	{
-		proto.RegisterDgraphUserServer(grpcServer, guide)
+		dgraph.RegisterDgraphUserServer(grpcServer, guide)
 		reflection.Register(grpcServer)
 	}
 	if err := grpcServer.Serve(lis); err != nil {

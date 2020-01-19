@@ -1,19 +1,19 @@
 package user
 
 import (
-	"github.com/benka-me/PaasEnger/service-hive/go/go-proto"
-	conn2 "github.com/benka-me/PaasEnger/services/db/pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/conn"
+	"github.com/benka-me/hive/go-pkg/hive"
 )
 
 const Uid_ = "uid"
 
 type (
 	UserQuery interface {
-		Get(dgraph conn2.Dgraph) (Users, error)
-		Set(dgraph conn2.Dgraph) (Uids, error)
-		Delete(dgraph conn2.Dgraph) (int, error)
-		SetAndGet(dgraph conn2.Dgraph) (Users, error)
-		DelAndGet(dgraph conn2.Dgraph) (Users, error)
+		Get(dgraph conn.Dgraph) (Users, error)
+		Set(dgraph conn.Dgraph) (Uids, error)
+		Delete(dgraph conn.Dgraph) (int, error)
+		SetAndGet(dgraph conn.Dgraph) (Users, error)
+		DelAndGet(dgraph conn.Dgraph) (Users, error)
 	}
 	RetUsers struct {
 		Users Users `json:"users"`
@@ -23,13 +23,13 @@ type (
 	}
 
 	Uid      string
-	User     proto.User
+	User     hive.User
 	Username string
 
 	Users []User
 	Uids  []Uid
 
-	NewUser      proto.NewUser
-	LoginRequest proto.LoginRequest
+	NewUser      hive.NewUser
+	LoginRequest hive.LoginRequest
 )
 

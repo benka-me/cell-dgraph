@@ -5,14 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	conn2 "github.com/benka-me/PaasEnger/services/db/pkg/conn"
-	queries2 "github.com/benka-me/PaasEnger/services/db/pkg/queries"
+	"github.com/benka-me/cell-dgraph/go-pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/queries"
 	"github.com/dgraph-io/dgo/protos/api"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func (lr LoginRequest) Login(dgraph conn2.Dgraph) (User, error) {
+func (lr LoginRequest) Login(dgraph conn.Dgraph) (User, error) {
 	type Check struct {
 		Check map[string]bool `json:"check"`
 	}
@@ -29,16 +29,16 @@ func (lr LoginRequest) Login(dgraph conn2.Dgraph) (User, error) {
 		return user, errors.New("can't find username")
 	}
 
-	if !queries2.CheckPassword(user.Id, lr.Password, dgraph) {
+	if !queries.CheckPassword(user.Id, lr.Password, dgraph) {
 		return User{}, errors.New("password don't match")
 	}
 
 	return user, nil
 }
 
-func QueryUsers(q string, dgraph conn2.Dgraph) (Users, error) {
+func QueryUsers(q string, dgraph conn.Dgraph) (Users, error) {
 	var tmp RetUsers
-	jsoned, err := queries2.Get(q, dgraph)
+	jsoned, err := queries.Get(q, dgraph)
 	if err != nil {
 		return tmp.Users, err
 	}
@@ -47,7 +47,7 @@ func QueryUsers(q string, dgraph conn2.Dgraph) (Users, error) {
 	return tmp.Users, nil
 }
 
-func (nu NewUser) NewUser(dgraph conn2.Dgraph) (User, error) {
+func (nu NewUser) NewUser(dgraph conn.Dgraph) (User, error) {
 	exist, _ := Username(nu.Username).Get(dgraph)
 	nu.Owner = true
 
@@ -77,7 +77,7 @@ func (nu NewUser) NewUser(dgraph conn2.Dgraph) (User, error) {
 	return ret, err
 }
 
-func GetHas(dgraph conn2.Dgraph, has string) (ret Uids, err error) {
+func GetHas(dgraph conn.Dgraph, has string) (ret Uids, err error) {
 	q := fmt.Sprintf(`
 		{
 			res(func: has(%s)) {
@@ -86,7 +86,7 @@ func GetHas(dgraph conn2.Dgraph, has string) (ret Uids, err error) {
 		}
 	`, has)
 	var tmp res
-	jsoned, err := queries2.Get(q, dgraph)
+	jsoned, err := queries.Get(q, dgraph)
 	if err != nil {
 		return
 	}
@@ -103,12 +103,12 @@ func GetHas(dgraph conn2.Dgraph, has string) (ret Uids, err error) {
 	return
 }
 
-func CountHas(dgraph conn2.Dgraph, has string) int {
+func CountHas(dgraph conn.Dgraph, has string) int {
 	count, _ := GetHas(dgraph, has)
 	return len(count)
 }
 
-func DeleteHas(dgraph conn2.Dgraph, has string) error {
+func DeleteHas(dgraph conn.Dgraph, has string) error {
 	uids, err := GetHas(dgraph, has)
 	if err != nil {
 		return err

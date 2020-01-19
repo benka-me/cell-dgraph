@@ -2,7 +2,7 @@ package user
 
 import (
 	"errors"
-	conn2 "github.com/benka-me/PaasEnger/services/db/pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/conn"
 )
 
 /**
@@ -10,10 +10,10 @@ import (
 BY Uids
 ****************************************************************************************************
 */
-func (uids Uids) Set(d conn2.Dgraph) (string, error) {
+func (uids Uids) Set(d conn.Dgraph) (string, error) {
 	return "", errors.New("you cannot insert users by uid")
 }
-func (uids Uids) Delete(d conn2.Dgraph) (int, error) {
+func (uids Uids) Delete(d conn.Dgraph) (int, error) {
 	var ret int = 0
 
 	for i, u := range uids {
@@ -27,15 +27,15 @@ func (uids Uids) Delete(d conn2.Dgraph) (int, error) {
 	return ret, nil
 }
 
-func (uids Uids) Get(d conn2.Dgraph) (Users, error) {
+func (uids Uids) Get(d conn.Dgraph) (Users, error) {
 	panic("implement me")
 }
 
-func (uids Uids) SetAndGet(d conn2.Dgraph) (Users, error) {
+func (uids Uids) SetAndGet(d conn.Dgraph) (Users, error) {
 	panic("implement me")
 }
 
-func (uids Uids) DelAndGet(d conn2.Dgraph) (Users, error) {
+func (uids Uids) DelAndGet(d conn.Dgraph) (Users, error) {
 	panic("implement me")
 }
 

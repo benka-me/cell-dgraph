@@ -3,7 +3,7 @@ package user
 import (
 	"context"
 	"encoding/json"
-	conn2 "github.com/benka-me/PaasEnger/services/db/pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/conn"
 	"github.com/dgraph-io/dgo"
 	"github.com/dgraph-io/dgo/protos/api"
 	"github.com/pkg/errors"
@@ -15,7 +15,7 @@ BY User
 ****************************************************************************************************
 */
 
-func (u User) Set(dgraph conn2.Dgraph) (Uid, error) {
+func (u User) Set(dgraph conn.Dgraph) (Uid, error) {
 	var id Uid = ""
 	txn := dgraph.NewTxn()
 	defer txn.Discard(context.TODO())
@@ -40,7 +40,7 @@ func (u User) Set(dgraph conn2.Dgraph) (Uid, error) {
 	return id, err
 }
 
-func (u User) Delete(dgraph conn2.Dgraph) (int32, error) {
+func (u User) Delete(dgraph conn.Dgraph) (int32, error) {
 	mp := map[string]string{"uid": u.Id}
 
 	pb, err := json.Marshal(mp)
@@ -62,7 +62,7 @@ func (u User) Delete(dgraph conn2.Dgraph) (int32, error) {
 	return 1, nil
 }
 
-func (u User) Get(dgraph conn2.Dgraph) (Users, error) {
+func (u User) Get(dgraph conn.Dgraph) (Users, error) {
 	if len(u.Id) > 2 {
 		return Uid(u.Id).Get(dgraph)
 	} else if len(u.Username) > 3 {
@@ -72,7 +72,7 @@ func (u User) Get(dgraph conn2.Dgraph) (Users, error) {
 	}
 }
 
-func (u User) SetAndGet(dgraph conn2.Dgraph) (Users, error) {
+func (u User) SetAndGet(dgraph conn.Dgraph) (Users, error) {
 	id, err := u.Set(dgraph)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ func (u User) SetAndGet(dgraph conn2.Dgraph) (Users, error) {
 	return id.Get(dgraph)
 }
 
-func (u User) DelAndGet(dgraph conn2.Dgraph) (Users, error) {
+func (u User) DelAndGet(dgraph conn.Dgraph) (Users, error) {
 	_, err := u.Delete(dgraph)
 	if err != nil {
 		return nil, err

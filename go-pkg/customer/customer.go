@@ -3,17 +3,17 @@ package customer
 import (
 	"context"
 	"encoding/json"
-	"github.com/benka-me/PaasEnger/service-hive/go/go-proto"
-	conn2 "github.com/benka-me/PaasEnger/services/db/pkg/conn"
-	room2 "github.com/benka-me/PaasEnger/services/db/pkg/room"
+	"github.com/benka-me/cell-dgraph/go-pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/room"
+	"github.com/benka-me/hive/go-pkg/hive"
 	"github.com/dgraph-io/dgo/protos/api"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-func Handshake(handshake *proto.HandshakeReq, dgraph conn2.Dgraph) (*proto.Welcome, error) {
-	wel := &proto.Welcome{
-		Customer: &proto.Customer{CustomerName: handshake.GetName()},
+func Handshake(handshake *hive.HandshakeReq, dgraph conn.Dgraph) (*hive.Welcome, error) {
+	wel := &hive.Welcome{
+		Customer: &hive.Customer{CustomerName: handshake.GetName()},
 		Room:     nil,
 		Message:  "",
 	}
@@ -37,7 +37,7 @@ func Handshake(handshake *proto.HandshakeReq, dgraph conn2.Dgraph) (*proto.Welco
 	for _, uid := range response.GetUids() {
 		wel.Customer.Id = uid
 	}
-	wel.Room, err = room2.InitEdges(handshake, wel.Customer.Id, dgraph)
+	wel.Room, err = room.InitEdges(handshake, wel.Customer.Id, dgraph)
 
 	return wel, err
 }

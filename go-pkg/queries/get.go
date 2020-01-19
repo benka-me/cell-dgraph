@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	conn2 "github.com/benka-me/PaasEnger/services/db/pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/conn"
 )
 
-func CheckPassword(uid, pwd string, dgraph conn2.Dgraph) bool {
+func CheckPassword(uid, pwd string, dgraph conn.Dgraph) bool {
 	txn := dgraph.NewTxn()
 	defer txn.Discard(context.TODO())
 
@@ -32,7 +32,7 @@ func CheckPassword(uid, pwd string, dgraph conn2.Dgraph) bool {
 	return true
 }
 
-func Get(q string, dgraph conn2.Dgraph) ([]byte, error) {
+func Get(q string, dgraph conn.Dgraph) ([]byte, error) {
 	txn := dgraph.NewTxn()
 	defer txn.Discard(context.TODO())
 

@@ -2,32 +2,32 @@ package tests
 
 import (
 	"fmt"
-	conn2 "github.com/benka-me/PaasEnger/services/db/pkg/conn"
-	fake2 "github.com/benka-me/PaasEnger/services/db/pkg/fake"
-	user2 "github.com/benka-me/PaasEnger/services/db/pkg/user"
+	"github.com/benka-me/cell-dgraph/go-pkg/conn"
+	"github.com/benka-me/cell-dgraph/go-pkg/fake"
+	"github.com/benka-me/cell-dgraph/go-pkg/user"
 	"github.com/google/go-cmp/cmp"
 	"testing"
 )
 
-var dgh conn2.Dgraph
+var dgh conn.Dgraph
 var err error
 
 func init() {
-	dgh.Dgraph, err = conn2.NewClient()
+	dgh.Dgraph, err = conn.NewClient()
 }
 
-var usersGood = user2.Users{
-	user2.User{Username: "Cjaou", Firstname: "Claire", Lastname: "Jaouen", Age: 27, Owner: false},
-	user2.User{Username: "Cjaou28", Firstname: "Claire", Lastname: "Jaouen", Age: 43, Owner: true},
-	user2.User{Username: "C", Firstname: "", Lastname: "", Age: 43, Owner: false},
-	user2.User{Username: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
-	user2.User{Username: "❤️"},
-	user2.User{Owner: true},
+var usersGood = user.Users{
+	user.User{Username: "Cjaou", Firstname: "Claire", Lastname: "Jaouen", Age: 27, Owner: false},
+	user.User{Username: "Cjaou28", Firstname: "Claire", Lastname: "Jaouen", Age: 43, Owner: true},
+	user.User{Username: "C", Firstname: "", Lastname: "", Age: 43, Owner: false},
+	user.User{Username: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+	user.User{Username: "❤️"},
+	user.User{Owner: true},
 }
 
-var usersBad = user2.Users{
-	user2.User{},
-	user2.User{Username: ""},
+var usersBad = user.Users{
+	user.User{},
+	user.User{Username: ""},
 }
 
 /**
@@ -36,12 +36,12 @@ Test newUser/login.
 
 func TestLogin(t *testing.T) {
 	var tests = []struct {
-		nu      user2.NewUser
+		nu      user.NewUser
 		wantErr bool
 	}{
-		{user2.NewUser{Username: "Cjaou", Password: "Apassword", Email: "fasdfasdf@fasdfa.fd"}, false},
-		{user2.NewUser{Username: "benka", Password: "Apaaaa", Email: "fasdfasdf@fasdfa.fd"}, false},
-		{user2.NewUser{Username: "benka22", Password: "A", Email: "fasdfasdf@fasdfa.fd"}, true},
+		{user.NewUser{Username: "Cjaou", Password: "Apassword", Email: "fasdfasdf@fasdfa.fd"}, false},
+		{user.NewUser{Username: "benka", Password: "Apaaaa", Email: "fasdfasdf@fasdfa.fd"}, false},
+		{user.NewUser{Username: "benka22", Password: "A", Email: "fasdfasdf@fasdfa.fd"}, true},
 	}
 	for _, tt := range tests {
 		nu, err := tt.nu.NewUser(dgh)
@@ -50,21 +50,21 @@ func TestLogin(t *testing.T) {
 		} else {
 			fmt.Println("New User: ", nu)
 
-			lg := user2.LoginRequest{Username: tt.nu.Username, Password: tt.nu.Password}
+			lg := user.LoginRequest{Username: tt.nu.Username, Password: tt.nu.Password}
 			ul, err := lg.Login(dgh)
 			if (err != nil) != tt.wantErr {
 				t.Error(err)
 			}
 			fmt.Println("User logged: ", ul)
 
-			lg = user2.LoginRequest{Username: tt.nu.Username, Password: tt.nu.Password + "4"}
+			lg = user.LoginRequest{Username: tt.nu.Username, Password: tt.nu.Password + "4"}
 			ul, err = lg.Login(dgh)
 			if err == nil {
 				t.Error(err)
 			}
 			fmt.Println("User not logged: ", err, " OK")
 
-			_, err = user2.Username(nu.Username).Delete(dgh)
+			_, err = user.Username(nu.Username).Delete(dgh)
 			if err != nil {
 				t.Error(err)
 			}
@@ -73,7 +73,7 @@ func TestLogin(t *testing.T) {
 }
 
 func TestNewUser(t *testing.T) {
-	var tests = []user2.NewUser{
+	var tests = []user.NewUser{
 		{Username: "Cjaou", Password: "Apassword", Email: "fasdfasdf@fasdfa.fd"},
 	}
 	for _, tt := range tests {
@@ -93,10 +93,10 @@ func TestNewUser(t *testing.T) {
 Test adding n fake users, count them, delete them and check the difference.
 */
 func Test1(t *testing.T) {
-	nStart := user2.CountHas(dgh, "Username")
+	nStart := user.CountHas(dgh, "Username")
 	nFake := 20
 
-	fakes := fake2.Users(nFake)
+	fakes := fake.Users(nFake)
 	if len(fakes) != nFake {
 		t.Errorf("fakeUsers returned bad number of fakes")
 	}
@@ -106,7 +106,7 @@ func Test1(t *testing.T) {
 		t.Error(err)
 	}
 
-	nWithFakes := user2.CountHas(dgh, "Username")
+	nWithFakes := user.CountHas(dgh, "Username")
 	if len(fakeAdded)+nStart != nWithFakes {
 		t.Error("has Username != nStart + lent(fakeAdded)", len(fakeAdded), nStart, nWithFakes)
 	}
@@ -122,7 +122,7 @@ func Test1(t *testing.T) {
 func TestUsername_DelAndGet(t *testing.T) {
 	tests := []*struct {
 		name string
-		u    user2.Username
+		u    user.Username
 	}{
 		{"Del Cjaou", "Cjaou"},
 		{"Del Benka", "Benka"},
@@ -142,20 +142,20 @@ func TestUsername_DelAndGet(t *testing.T) {
 func TestUserGetDel(t *testing.T) {
 	tests := []*struct {
 		name       string
-		u          user2.User
-		wantSet    user2.Users
-		wantDel    user2.Users
+		u          user.User
+		wantSet    user.Users
+		wantDel    user.Users
 		wantErrSet bool
 		wantErrDel bool
 	}{
-		{"Full fields valid", usersGood[0], user2.Users{usersGood[0]}, user2.Users{user2.User{}}, false, false},
-		{"Full fields valid same name", usersGood[1], user2.Users{usersGood[1]}, user2.Users{user2.User{}}, false, false},
-		{"Username, Firstname, Lastname, Age", usersGood[2], user2.Users{usersGood[2]}, user2.Users{user2.User{}}, false, false},
-		{"Username only, too long char", usersGood[3], user2.Users{usersGood[3]}, user2.Users{user2.User{}}, false, false},
-		{"Username only, ❤️", usersGood[4], user2.Users{usersGood[4]}, user2.Users{user2.User{}}, false, false},
-		{"Owner only️", usersGood[5], user2.Users{usersGood[5]}, user2.Users{user2.User{}}, false, false},
-		{"EMPTY Object", usersBad[0], user2.Users{}, user2.Users{}, true, true},
-		{"Username EMPTY", usersBad[1], user2.Users{}, user2.Users{}, true, true},
+		{"Full fields valid", usersGood[0], user.Users{usersGood[0]}, user.Users{user.User{}}, false, false},
+		{"Full fields valid same name", usersGood[1], user.Users{usersGood[1]}, user.Users{user.User{}}, false, false},
+		{"Username, Firstname, Lastname, Age", usersGood[2], user.Users{usersGood[2]}, user.Users{user.User{}}, false, false},
+		{"Username only, too long char", usersGood[3], user.Users{usersGood[3]}, user.Users{user.User{}}, false, false},
+		{"Username only, ❤️", usersGood[4], user.Users{usersGood[4]}, user.Users{user.User{}}, false, false},
+		{"Owner only️", usersGood[5], user.Users{usersGood[5]}, user.Users{user.User{}}, false, false},
+		{"EMPTY Object", usersBad[0], user.Users{}, user.Users{}, true, true},
+		{"Username EMPTY", usersBad[1], user.Users{}, user.Users{}, true, true},
 	}
 	for _, tt := range tests {
 		t.Run("SET/"+tt.name, func(t *testing.T) {
